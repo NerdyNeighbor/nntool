@@ -342,6 +342,37 @@ function Update-Progress {
 function Generate-Report {
     Write-Log "Generating customer report..." "INFO"
     
+    # Build task list HTML separately to avoid encoding issues
+    $taskListHtml = ""
+    foreach ($task in $script:SuccessActions) {
+        $taskListHtml += "<li>&#10004; $task</li>`n"
+    }
+    
+    # Build warnings HTML
+    $warningsHtml = ""
+    if ($script:Warnings.Count -gt 0) {
+        $warningsHtml = "<div class=`"section`"><h2>Warnings</h2><ul>"
+        foreach ($warning in $script:Warnings) {
+            $warningsHtml += "<li class=`"warning`">&#9888; $warning</li>"
+        }
+        $warningsHtml += "</ul></div>"
+    }
+    
+    # Build errors HTML  
+    $errorsHtml = ""
+    if ($script:Errors.Count -gt 0) {
+        $errorsHtml = "<div class=`"section`"><h2>Errors Encountered</h2><ul>"
+        foreach ($error in $script:Errors) {
+            $errorsHtml += "<li class=`"error`">&#10006; $error</li>"
+        }
+        $errorsHtml += "</ul></div>"
+    }
+    
+    $os = Get-WmiObject -Class Win32_OperatingSystem
+    $uptime = (Get-Date) - (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
+    $ram = [math]::Round((Get-WmiObject -Class Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
+    $summaryText = if ($script:Errors.Count -eq 0) { "All tasks were successful." } else { "Some issues were encountered - please review the errors above." }
+    
     $html = @"
 <!DOCTYPE html>
 <html>
@@ -378,59 +409,30 @@ function Generate-Report {
         <div class="info-grid">
             <div class="info-label">Computer Name:</div>
             <div>$env:COMPUTERNAME</div>
-            
             <div class="info-label">Username:</div>
             <div>$env:USERNAME</div>
-            
             <div class="info-label">Operating System:</div>
-            <div>$(Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Caption)</div>
-            
+            <div>$($os.Caption)</div>
             <div class="info-label">System Uptime:</div>
-            <div>$((Get-Date) - (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime | ForEach-Object { "$($_.Days) days, $($_.Hours) hours" })</div>
-            
+            <div>$($uptime.Days) days, $($uptime.Hours) hours</div>
             <div class="info-label">Total RAM:</div>
-            <div>$([math]::Round((Get-WmiObject -Class Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)) GB</div>
+            <div>$ram GB</div>
         </div>
     </div>
     
     <div class="section">
         <h2>Maintenance Tasks Completed</h2>
         <ul class="task-list">
-            $(foreach ($task in $script:SuccessActions) {
-                "<li>&#10004; $task</li>"
-            })
+            $taskListHtml
         </ul>
     </div>
     
-    $(if ($script:Warnings.Count -gt 0) {
-        @"
-        <div class="section">
-            <h2>Warnings</h2>
-            <ul>
-                $(foreach ($warning in $script:Warnings) {
-                    "<li class='warning'>&#9888; $warning</li>"
-                })
-            </ul>
-        </div>
-"@
-    })
-    
-    $(if ($script:Errors.Count -gt 0) {
-        @"
-        <div class="section">
-            <h2>Errors Encountered</h2>
-            <ul>
-                $(foreach ($error in $script:Errors) {
-                    "<li class='error'>&#10006; $error</li>"
-                })
-            </ul>
-        </div>
-"@
-    })
+    $warningsHtml
+    $errorsHtml
     
     <div class="summary-box">
         <h3>Summary</h3>
-        <p>The system maintenance has been completed. $(if ($script:Errors.Count -eq 0) { "All tasks were successful." } else { "Some issues were encountered - please review the errors above." })</p>
+        <p>The system maintenance has been completed. $summaryText</p>
         <p><strong>Recommendations:</strong></p>
         <ul>
             <li>Restart the computer to ensure all changes take effect</li>
