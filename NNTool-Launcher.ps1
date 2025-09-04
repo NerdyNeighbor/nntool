@@ -35,8 +35,8 @@ Set-Location $nnToolPath
 Write-Host "Download location: $nnToolPath" -ForegroundColor Gray
 Write-Host ""
 
-# GitHub repository info (update with your actual repo)
-$baseUrl = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/nntool/main"
+# GitHub repository info
+$baseUrl = "https://raw.githubusercontent.com/NerdyNeighbor/nntool/main"
 
 # Alternative: Use your own server
 # $baseUrl = "https://tools.nerdyneighbor.net/nntool"
