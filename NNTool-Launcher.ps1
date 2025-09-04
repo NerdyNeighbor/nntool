@@ -46,6 +46,7 @@ $files = @(
     @{Name = "NNTool-Main.ps1"; Path = "NNTool-Main.ps1"},
     @{Name = "Remove-Antivirus.ps1"; Path = "Modules/Remove-Antivirus.ps1"},
     @{Name = "Run-Malwarebytes.ps1"; Path = "Modules/Run-Malwarebytes.ps1"},
+    @{Name = "Run-Malwarebytes-Debug.ps1"; Path = "Modules/Run-Malwarebytes-Debug.ps1"},
     @{Name = "Remove-RemoteTools.ps1"; Path = "Modules/Remove-RemoteTools.ps1"},
     @{Name = "Run-SystemRepair.ps1"; Path = "Modules/Run-SystemRepair.ps1"},
     @{Name = "Run-WindowsUpdate.ps1"; Path = "Modules/Run-WindowsUpdate.ps1"}
