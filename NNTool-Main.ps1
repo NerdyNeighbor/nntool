@@ -268,13 +268,23 @@ function Start-Maintenance {
             # Task 1: Remove Third-Party Antivirus
             if ($script:TaskChecks["Remove Third-Party Antivirus"].Checked) {
                 Update-Progress "Removing third-party antivirus..." 10
-                & "$PSScriptRoot\Modules\Remove-Antivirus.ps1"
+                try {
+                    & "$PSScriptRoot\Modules\Remove-Antivirus.ps1" -LogFunction "Write-Log"
+                    Write-Log "Antivirus removal module completed" "SUCCESS"
+                } catch {
+                    Write-Log "Antivirus removal failed: $_" "ERROR"
+                }
             }
             
             # Task 2: Malwarebytes Scan
             if ($script:TaskChecks["Malwarebytes Scan & Clean"].Checked) {
                 Update-Progress "Running Malwarebytes scan..." 25
-                & "$PSScriptRoot\Modules\Run-Malwarebytes-Debug.ps1"
+                try {
+                    & "$PSScriptRoot\Modules\Run-Malwarebytes.ps1" -LogFunction "Write-Log"
+                    Write-Log "Malwarebytes scan module completed" "SUCCESS"
+                } catch {
+                    Write-Log "Malwarebytes scan failed: $_" "ERROR"
+                }
             }
             
             # Task 3: Remove Remote Access Tools
