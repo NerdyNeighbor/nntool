@@ -2,8 +2,9 @@
 # This script downloads and runs the NNTool suite
 # Usage: iwr -useb https://nntool.nerdyneighbor.net | iex
 
-# Force TLS 1.2
+# Force TLS 1.2 and disable caching
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+[System.Net.WebRequest]::DefaultCachePolicy = New-Object System.Net.Cache.RequestCachePolicy([System.Net.Cache.RequestCacheLevel]::NoCacheNoStore)
 
 # Check for admin
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
