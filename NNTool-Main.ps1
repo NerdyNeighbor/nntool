@@ -274,7 +274,7 @@ function Start-Maintenance {
             # Task 2: Malwarebytes Scan
             if ($script:TaskChecks["Malwarebytes Scan & Clean"].Checked) {
                 Update-Progress "Running Malwarebytes scan..." 25
-                & "$PSScriptRoot\Modules\Run-Malwarebytes.ps1"
+                & "$PSScriptRoot\Modules\Run-Malwarebytes-Debug.ps1"
             }
             
             # Task 3: Remove Remote Access Tools
