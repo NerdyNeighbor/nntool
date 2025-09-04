@@ -59,16 +59,47 @@ $downloadErrors = @()
 
 foreach ($file in $files) {
     Write-Host "Downloading $($file.Name)..." -ForegroundColor Gray -NoNewline
-    Write-Host " (from $baseUrl/$($file.Path))" -ForegroundColor DarkGray
     
     try {
         $url = "$baseUrl/$($file.Path)"
         $destination = Join-Path $nnToolPath $file.Path
         
-        Invoke-WebRequest -Uri $url -OutFile $destination -UseBasicParsing -ErrorAction Stop
-        Write-Host " [OK]" -ForegroundColor Green
+        # Force fresh download with cache buster
+        $cacheBuster = Get-Random
+        $urlWithCache = "$url?nocache=$cacheBuster"
+        
+        Invoke-WebRequest -Uri $urlWithCache -OutFile $destination -UseBasicParsing -ErrorAction Stop
+        
+        # Verify file was downloaded and get size
+        if (Test-Path $destination) {
+            $fileSize = (Get-Item $destination).Length
+            Write-Host " [OK - $fileSize bytes]" -ForegroundColor Green
+            
+            # For the main file, check if it contains the updated code
+            if ($file.Name -eq "NNTool-Main.ps1") {
+                $content = Get-Content $destination -Raw
+                if ($content -like "*Run-Malwarebytes.ps1*" -and $content -like "*LogFunction*") {
+                    Write-Host "  ✓ Main file contains updated Malwarebytes integration" -ForegroundColor Green
+                } else {
+                    Write-Host "  ✗ Main file may be outdated" -ForegroundColor Yellow
+                }
+            }
+            
+            # For Malwarebytes module, check for the fix
+            if ($file.Name -eq "Run-Malwarebytes.ps1") {
+                $content = Get-Content $destination -Raw
+                if ($content -like "*Malwarebytes is already installed*" -and $content -notlike "*exit 1*") {
+                    Write-Host "  ✓ Malwarebytes module contains the fix" -ForegroundColor Green
+                } else {
+                    Write-Host "  ✗ Malwarebytes module may be outdated" -ForegroundColor Yellow
+                }
+            }
+        } else {
+            Write-Host " [FAILED - File not created]" -ForegroundColor Red
+            $downloadErrors += $file.Name
+        }
     } catch {
-        Write-Host " [FAILED]" -ForegroundColor Red
+        Write-Host " [FAILED - $_]" -ForegroundColor Red
         $downloadErrors += $file.Name
     }
 }
