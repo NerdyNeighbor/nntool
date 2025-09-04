@@ -59,6 +59,7 @@ $downloadErrors = @()
 
 foreach ($file in $files) {
     Write-Host "Downloading $($file.Name)..." -ForegroundColor Gray -NoNewline
+    Write-Host " (from $baseUrl/$($file.Path))" -ForegroundColor DarkGray
     
     try {
         $url = "$baseUrl/$($file.Path)"
