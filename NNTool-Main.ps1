@@ -397,7 +397,7 @@ function Generate-Report {
         <h2>Maintenance Tasks Completed</h2>
         <ul class="task-list">
             $(foreach ($task in $script:SuccessActions) {
-                "<li>✓ $task</li>"
+                "<li>&#10004; $task</li>"
             })
         </ul>
     </div>
@@ -408,7 +408,7 @@ function Generate-Report {
             <h2>Warnings</h2>
             <ul>
                 $(foreach ($warning in $script:Warnings) {
-                    "<li class='warning'>⚠ $warning</li>"
+                    "<li class='warning'>&#9888; $warning</li>"
                 })
             </ul>
         </div>
@@ -421,7 +421,7 @@ function Generate-Report {
             <h2>Errors Encountered</h2>
             <ul>
                 $(foreach ($error in $script:Errors) {
-                    "<li class='error'>✗ $error</li>"
+                    "<li class='error'>&#10006; $error</li>"
                 })
             </ul>
         </div>
