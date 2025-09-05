@@ -55,12 +55,6 @@ $AntivirusProducts = @{
         Processes = @("eset*", "ekrn", "egui")
         RemovalTool = "https://support.eset.com/en/kb2289-uninstall-eset-manually-using-the-eset-uninstaller-tool"
     }
-    "Malwarebytes" = @{
-        DisplayNames = @("Malwarebytes*")
-        Services = @("MBAMService", "Malwarebytes*")
-        Processes = @("mbam*", "malwarebytes*")
-        RemovalTool = "https://support.malwarebytes.com/hc/en-us/articles/360039023473"
-    }
     "Trend Micro" = @{
         DisplayNames = @("Trend Micro*")
         Services = @("TM*", "Trend*", "ntrtscan", "tmlisten")
