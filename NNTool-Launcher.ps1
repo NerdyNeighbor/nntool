@@ -65,11 +65,13 @@ foreach ($file in $files) {
         $url = "$baseUrl/$($file.Path)"
         $destination = Join-Path $nnToolPath $file.Path
         
-        # Force fresh download with cache buster
-        $cacheBuster = Get-Random
-        $urlWithCache = "$url?nocache=$cacheBuster"
+        # Download with no-cache headers instead of URL parameters
+        $headers = @{
+            'Cache-Control' = 'no-cache, no-store, must-revalidate'
+            'Pragma' = 'no-cache'
+        }
         
-        Invoke-WebRequest -Uri $urlWithCache -OutFile $destination -UseBasicParsing -ErrorAction Stop
+        Invoke-WebRequest -Uri $url -OutFile $destination -UseBasicParsing -Headers $headers -ErrorAction Stop
         
         # Verify file was downloaded and get size
         if (Test-Path $destination) {
