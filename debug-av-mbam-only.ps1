@@ -132,25 +132,24 @@ if ($mbamService2) {
 
 Write-Host ""
 
-# Only proceed with Malwarebytes test if it's still available
-if ((Test-Path $mbamExe) -and $mbamReg2) {
-    # Test 2: Malwarebytes Scan
-    Write-Host "=== STEP 2: MALWAREBYTES SCAN ===" -ForegroundColor Yellow
-    Write-Host "Expected: Should find executable and launch scan" -ForegroundColor Gray
+# Test 2: Malwarebytes Scan (always run - let the module handle detection/installation)
+Write-Host "=== STEP 2: MALWAREBYTES SCAN ===" -ForegroundColor Yellow
+Write-Host "Expected: Should detect broken installation and install fresh copy" -ForegroundColor Gray
+Write-Host ""
+
+try {
+    $mbamModule = Join-Path $debugPath "Modules\Run-Malwarebytes.ps1"
+    Write-Host "Running Malwarebytes module..." -ForegroundColor Cyan
+    Write-Host "(This should detect missing executable and install fresh copy)" -ForegroundColor Gray
     Write-Host ""
     
-    try {
-        $mbamModule = Join-Path $debugPath "Modules\Run-Malwarebytes.ps1"
-        & $mbamModule
-        Write-Host ""
-        Write-Host "Malwarebytes module completed with exit code: $LASTEXITCODE" -ForegroundColor Gray
-    } catch {
-        Write-Host "ERROR in Malwarebytes module: $_" -ForegroundColor Red
-    }
-} else {
-    Write-Host "=== STEP 2: MALWAREBYTES SCAN ===" -ForegroundColor Yellow
-    Write-Host "SKIPPED: Malwarebytes was removed by antivirus module!" -ForegroundColor Red
-    Write-Host "This confirms the bug - antivirus removal is still removing Malwarebytes" -ForegroundColor Red
+    & $mbamModule
+    
+    Write-Host ""
+    Write-Host "Malwarebytes module completed with exit code: $LASTEXITCODE" -ForegroundColor Gray
+} catch {
+    Write-Host "ERROR in Malwarebytes module: $_" -ForegroundColor Red
+    Write-Host "Exception details: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
